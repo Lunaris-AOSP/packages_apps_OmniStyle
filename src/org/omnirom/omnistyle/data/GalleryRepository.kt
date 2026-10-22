@@ -29,7 +29,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import org.omnirom.omnistyle.HeaderUtils
 import org.omnirom.omnistyle.NetworkUtils
 import org.xmlpull.v1.XmlPullParser
@@ -123,30 +122,8 @@ class GalleryRepository(private val context: Context) {
         if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) != true) {
             throw IOException(context.getString(org.omnirom.omnistyle.R.string.no_network_message))
         }
-        val directory = if (kind == GalleryKind.Headers) "headers" else "wallpapers"
-        val base = "https://dl.omnirom.org/images/$directory/"
-        val json = NetworkUtils.downloadUrlMemoryAsString("${base}thumbs/json_${directory}_xml.php")
-            ?: throw IOException("Unable to load image directory")
-        val array = JSONArray(json)
-        val images = mutableListOf<GalleryImage>()
-        for (index in 0 until array.length()) {
-            val item = array.optJSONObject(index) ?: continue
-            val filename = item.text("filename").takeIf { it.isNotBlank() } ?: continue
-            if (File(filename).name != filename || filename == "." || filename == "..") continue
-            if (filename.substringAfterLast('.').lowercase() !in listOf("png", "jpg", "jpeg", "webp")) continue
-            val collection = item.text("tag").takeIf { it.isNotBlank() }
-                ?: if (kind == GalleryKind.Headers) Regex("^[a-zA-Z]+").find(filename)?.value ?: "other" else "other"
-            if (!filter.isNullOrBlank() && collection != filter) continue
-            images += GalleryImage(
-                id = "$directory/$filename",
-                name = item.text("name").takeIf { it.isNotBlank() } ?: readableName(filename.substringBeforeLast('.')),
-                creator = item.text("creator").takeUnless { it.lowercase() in listOf("zzz", "unkown", "unknown") }.orEmpty(),
-                collection = collection,
-                previewUri = "${base}thumbs/${Uri.encode(filename)}",
-                fullUri = "$base${Uri.encode(filename)}",
-            )
-        }
-        return GalleryCatalog(images.distinctBy { it.id }, collectionsFor(images))
+        val images = OnlineGallery(NetworkUtils::downloadUrlMemoryAsString).load(kind, filter)
+        return GalleryCatalog(images, collectionsFor(images))
     }
 
     private fun collectionsFor(images: List<GalleryImage>) = images.map { it.collection }
@@ -261,9 +238,6 @@ private fun validImage(file: File): Boolean {
     BitmapFactory.decodeFile(file.absolutePath, options)
     return options.outWidth > 0 && options.outHeight > 0
 }
-
-private fun org.json.JSONObject.text(key: String): String =
-    if (isNull(key)) "" else optString(key).trim()
 
 private fun galleryResource(context: Context, uri: Uri): Pair<Resources, Int> {
     val packageName = uri.authority ?: throw IOException("Image package missing")

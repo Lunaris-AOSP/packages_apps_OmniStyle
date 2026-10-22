@@ -34,15 +34,20 @@ public class NetworkUtils {
 
     private static final int HTTP_READ_TIMEOUT = 60000;
     private static final int HTTP_CONNECTION_TIMEOUT = 60000;
+    private static final int HTTP_CATALOG_TIMEOUT = 15000;
 
     public static HttpsURLConnection setupHttpsRequest(String urlStr) {
+        return setupHttpsRequest(urlStr, HTTP_CONNECTION_TIMEOUT, HTTP_READ_TIMEOUT);
+    }
+
+    private static HttpsURLConnection setupHttpsRequest(String urlStr, int connectTimeout, int readTimeout) {
         URL url;
         HttpsURLConnection urlConnection = null;
         try {
             url = new URL(urlStr);
             urlConnection = (HttpsURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(HTTP_CONNECTION_TIMEOUT);
-            urlConnection.setReadTimeout(HTTP_READ_TIMEOUT);
+            urlConnection.setConnectTimeout(connectTimeout);
+            urlConnection.setReadTimeout(readTimeout);
             urlConnection.setRequestMethod("GET");
             urlConnection.setDoInput(true);
             urlConnection.connect();
@@ -105,7 +110,7 @@ public class NetworkUtils {
 
         HttpsURLConnection urlConnection = null;
         try {
-            urlConnection = setupHttpsRequest(url);
+            urlConnection = setupHttpsRequest(url, HTTP_CATALOG_TIMEOUT, HTTP_CATALOG_TIMEOUT);
             if (urlConnection == null) {
                 return null;
             }
