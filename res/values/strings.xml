@@ -16,6 +16,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
+    <string name="app_name">OmniStyle</string>
+    <string name="headers_description">A little personality for your quick settings.</string>
+    <string name="wallpapers_description">Make every screen feel like you.</string>
+    <string name="collection_label">Collection</string>
+    <string name="all_collections">All collections</string>
+    <plurals name="collection_size">
+        <item quantity="one">%1$d image</item>
+        <item quantity="other">%1$d images</item>
+    </plurals>
+    <string name="loading_images">Finding your next look…</string>
+    <string name="empty_collection_title">More style awaits</string>
+    <string name="empty_collection_message">No images in this collection yet. Try another collection or explore online.</string>
+    <string name="load_collection_failed">Could not load this collection</string>
+    <string name="load_collection_failed_message">Check your connection and try again.</string>
+    <string name="retry">Try again</string>
+    <string name="preview_image">Preview %1$s</string>
+    <string name="close_preview">Close preview</string>
+    <string name="apply_header">Set header</string>
+    <string name="apply_wallpaper">Set wallpaper</string>
+    <string name="save_image">Download image</string>
+    <string name="image_saved">Saved to Pictures/OmniStyle</string>
+    <string name="image_action_failed">Could not save or apply this image</string>
+    <string name="image_preview_failed">Preview unavailable</string>
+    <string name="image_preview_retry">Reload preview</string>
+    <string name="header_preview_label">Quick settings preview</string>
+    <string name="wallpaper_preview_label">Wallpaper preview</string>
+    <string name="preview_wifi">Wi-Fi</string>
+    <string name="preview_bluetooth">Bluetooth</string>
+    <string name="applied_header">Current header</string>
+    <string name="sort_images">Sort images</string>
+    <string name="crop_to_screen">Fit to screen</string>
+    <string name="keep_scrolling">Keep scrolling</string>
+    <string name="cancel">Cancel</string>
+    <string name="theme_collection">Theme</string>
     <string name="browse_header">Headers</string>
     <string name="custom_header_image_notice">Header image set</string>
     <string name="browse_walls">Wallpapers</string>

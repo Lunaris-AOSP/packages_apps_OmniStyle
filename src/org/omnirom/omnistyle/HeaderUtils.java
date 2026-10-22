@@ -63,7 +63,6 @@ public class HeaderUtils {
             parser.setInput(in, "UTF-8");
             creatorName = loadResourcesFromXmlParser(parser, headersList);
         } finally {
-            // Cleanup resources
             if (parser instanceof XmlResourceParser) {
                 ((XmlResourceParser) parser).close();
             }
@@ -140,7 +139,7 @@ public class HeaderUtils {
                 if (headerInfo.mImage != null) {
                     headersList.add(headerInfo);
                 }
-            } else if (name.equalsIgnoreCase("meta_data")) {
+            } else if (name.equalsIgnoreCase("meta_data") || name.equalsIgnoreCase("meta-data")) {
                 creatorName = parser.getAttributeValue(null, "creator");
                 if (DEBUG) Log.i(TAG, "creator = " + creatorName);
             }

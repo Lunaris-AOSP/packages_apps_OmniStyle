@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.OmniStyle" parent="Theme.Material3.DayNight">
+    <style name="Theme.OmniStyle" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">?attr/colorPrimary</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
+        <item name="android:windowActionModeOverlay">true</item>
     </style>
 
 </resources>

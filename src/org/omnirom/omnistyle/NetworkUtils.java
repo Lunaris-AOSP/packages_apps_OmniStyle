@@ -49,11 +49,15 @@ public class NetworkUtils {
             int code = urlConnection.getResponseCode();
             if (code != HttpsURLConnection.HTTP_OK) {
                 Log.d(TAG, "response:" + code);
+                urlConnection.disconnect();
                 return null;
             }
             return urlConnection;
         } catch (Exception e) {
             Log.e(TAG, "Failed to connect to server", e);
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
             return null;
         }
     }
@@ -71,27 +75,22 @@ public class NetworkUtils {
             if (urlConnection == null) {
                 return false;
             }
-            long len = urlConnection.getContentLength();
-            if ((len > 0) && (len < 4L * 1024L * 1024L * 1024L)) {
+            long len = urlConnection.getContentLengthLong();
+            if (len < 4L * 1024L * 1024L * 1024L) {
                 byte[] buffer = new byte[262144];
-
-                InputStream is = urlConnection.getInputStream();
-                FileOutputStream os = new FileOutputStream(f, false);
-                try {
+                long written = 0;
+                try (InputStream is = urlConnection.getInputStream();
+                        FileOutputStream os = new FileOutputStream(f, false)) {
                     int r;
                     while ((r = is.read(buffer)) > 0) {
                         os.write(buffer, 0, r);
+                        written += r;
                     }
-                } finally {
-                    os.close();
                 }
-
-                return true;
+                return written > 0 && (len < 0 || written == len);
             }
             return false;
         } catch (Exception e) {
-            // Download failed for any number of reasons, timeouts, connection
-            // drops, etc. Just log it in debugging mode.
             Log.e(TAG, "", e);
             return false;
         } finally {
@@ -111,24 +110,16 @@ public class NetworkUtils {
                 return null;
             }
 
-            InputStream is = urlConnection.getInputStream();
-            ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-            int byteInt;
-
-            while ((byteInt = is.read()) >= 0) {
-                byteArray.write(byteInt);
+            try (InputStream is = urlConnection.getInputStream();
+                    ByteArrayOutputStream byteArray = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = is.read(buffer)) != -1) {
+                    byteArray.write(buffer, 0, count);
+                }
+                return byteArray.toString(StandardCharsets.UTF_8.name());
             }
-
-            byte[] bytes = byteArray.toByteArray();
-            if (bytes == null) {
-                return null;
-            }
-            String responseBody = new String(bytes, StandardCharsets.UTF_8);
-
-            return responseBody;
         } catch (Exception e) {
-            // Download failed for any number of reasons, timeouts, connection
-            // drops, etc. Just log it in debugging mode.
             Log.e(TAG, "", e);
             return null;
         } finally {
